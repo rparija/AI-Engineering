@@ -98,3 +98,6 @@ This repo is organized as a learning journey. Most folders are timestamped lesso
 - Some folders contain independent Maven, Python, or frontend projects with their own setup instructions.
 - Generated folders such as `node_modules` and `target` are intentionally excluded from version control.
 - Example config files now use placeholders for sensitive values; add your own local keys before running AI-powered demos.
+
+## Credits
+special thanks to Naveen Telusko and team who prepared this wonderful course which i attended and gained all this knowledge. Forever Grateful.
