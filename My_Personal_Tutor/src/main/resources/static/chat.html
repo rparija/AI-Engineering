@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tutor | Intelligent Learning Companion</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #343541;
+            color: #ECECF1;
+        }
+
+        .sidebar {
+            background-color: #202123;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #343541;
+        }
+
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 150px;
+            scroll-behavior: smooth;
+        }
+
+        .message-row {
+            padding: 24px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .message-row.user {
+            background-color: #343541;
+        }
+
+        .message-row.ai {
+            background-color: #444654;
+        }
+
+        .avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .avatar.user {
+            background-color: #5436DA;
+        }
+
+        .avatar.ai {
+            background-color: #10a37f;
+        }
+
+        .input-area {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-image: linear-gradient(180deg, rgba(53, 55, 64, 0), #353740 58.85%);
+            padding: 24px 0 40px;
+            z-index: 10;
+        }
+
+        .input-box-container {
+            background-color: #40414F;
+            border: 1px solid rgba(32, 33, 35, .5);
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            padding: 10px 16px;
+            max-width: 768px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .input-box {
+            background: transparent;
+            border: none;
+            color: white;
+            flex: 1;
+            font-size: 1rem;
+            max-height: 200px;
+            outline: none;
+            overflow-y: hidden;
+            resize: none;
+            rows: 1;
+        }
+
+        .send-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: rgb(142, 142, 160);
+            transition: color 0.2s;
+        }
+
+        .send-btn:hover {
+            color: #d9d9e3;
+        }
+
+        .active-session {
+            background-color: #343541;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Modal Styles */
+        #loginModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(52, 53, 65, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+        }
+
+        .modal-content {
+            background-color: #202123;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body class="flex h-full">
+
+    <!-- Login Modal -->
+    <div id="loginModal">
+        <div class="modal-content">
+            <h2 class="text-2xl font-semibold mb-2">Welcome to AI Tutor</h2>
+            <p class="text-gray-400 mb-6 text-sm">Please enter your User ID or Name to continue.</p>
+            <input type="text" id="usernameInput"
+                class="w-full bg-[#40414F] border border-gray-600 rounded px-4 py-3 text-white focus:outline-none focus:border-[#10a37f] mb-4"
+                placeholder="e.g., student-1" />
+            <button onclick="login()"
+                class="w-full bg-[#10a37f] hover:bg-[#1a7f64] text-white font-medium py-3 rounded transition duration-200">
+                Start Learning
+            </button>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar w-[260px] hidden md:flex flex-col p-2 text-white border-r border-white/10">
+        <a onclick="createNewChat()"
+            class="flex items-center gap-3 px-3 py-3 rounded-md hover:background-gray-900 cursor-pointer border border-white/20 transition-all hover:bg-[#2A2B32]">
+            <span class="text-xl">+</span>
+            <span class="text-sm">New chat</span>
+        </a>
+        <div class="flex-1 overflow-y-auto mt-4" id="sessionsList">
+            <!-- Sessions will be injected here -->
+        </div>
+        <div class="border-t border-white/20 pt-2">
+            <div class="flex items-center gap-3 px-3 py-3 hover:bg-[#2A2B32] rounded-md cursor-pointer text-sm"
+                onclick="location.reload()">
+                <div class="w-6 h-6 bg-purple-600 rounded flex items-center justify-center text-xs">U</div>
+                <div id="sidebarUsername">User Account</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Chat Area -->
+    <div class="chat-container relative">
+        <!-- Messages -->
+        <div class="messages-area" id="messagesArea">
+            <!-- Welcome Message (Placeholder) -->
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <div class="flex justify-center mb-2">
+                <button
+                    class="flex items-center gap-2 bg-[#444654] border border-gray-600 rounded px-3 py-1 text-xs text-gray-300 hover:bg-[#50526e] transition">
+                    <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                    <span id="connectionStatus">Disconnected</span>
+                </button>
+            </div>
+            <div class="max-w-3xl mx-auto px-4">
+                <div class="input-box-container">
+                    <textarea id="messageInput" class="input-box" rows="1" placeholder="Send a message..."
+                        onkeydown="handleEnter(event)"></textarea>
+                    <button class="send-btn" onclick="sendMessage()">
+                        <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24"
+                            stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" height="1em" width="1em"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var stompClient = null;
+        var currentUserId = "";
+        var currentSessionId = "";
+
+        const messagesArea = document.getElementById('messagesArea');
+        const messageInput = document.getElementById('messageInput');
+
+        // --- Login & Session Logic ---
+
+        function login() {
+            const input = document.getElementById('usernameInput').value.trim();
+            if (!input) return alert("Please enter a User ID");
+
+            currentUserId = input;
+            document.getElementById('sidebarUsername').textContent = currentUserId;
+            document.getElementById('loginModal').style.display = 'none';
+
+            fetchSessions();
+        }
+
+        // Allow enter key for login
+        document.getElementById('usernameInput').addEventListener("keypress", function (event) {
+            if (event.key === "Enter") login();
+        });
+
+        function fetchSessions() {
+            fetch('/api/chat/sessions?userId=' + currentUserId)
+                .then(res => res.json())
+                .then(sessions => {
+                    renderSessionsList(sessions);
+                    if (sessions.length > 0) {
+                        // Load most recent session
+                        loadSession(sessions[0].sessionId);
+                    } else {
+                        // Create first session
+                        createNewChat();
+                    }
+                })
+                .catch(err => console.error("Error fetching sessions:", err));
+        }
+
+        function createNewChat() {
+            fetch('/api/chat/sessions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: currentUserId })
+            })
+                .then(res => res.json())
+                .then(session => {
+                    // Refresh list and load new
+                    fetchSessions();
+                });
+        }
+
+        function renderSessionsList(sessions) {
+            const container = document.getElementById('sessionsList');
+            container.innerHTML = `<div class="text-xs font-medium text-gray-500 mb-2 px-3">History</div>`;
+
+            sessions.forEach(session => {
+                const div = document.createElement('div');
+                div.className = `px-3 py-2 text-sm text-gray-100 rounded-md cursor-pointer truncate mb-1 ${session.sessionId === currentSessionId ? 'active-session' : 'hover:bg-[#2A2B32]'}`;
+                div.textContent = session.title || "New Chat";
+                div.onclick = () => loadSession(session.sessionId);
+                container.appendChild(div);
+            });
+        }
+
+        function loadSession(sessionId) {
+            if (currentSessionId === sessionId) return;
+            currentSessionId = sessionId;
+
+            // Disconnect old
+            if (stompClient) {
+                stompClient.disconnect();
+                stompClient = null;
+            }
+
+            // Clear UI
+            messagesArea.innerHTML = '';
+            document.getElementById('connectionStatus').textContent = "Connecting...";
+
+            // Re-render sidebar to highlight active
+            // (Ideally we just update the class, but fetching is fast enough for prototype)
+            // Or just manually update:
+            const links = document.getElementById('sessionsList').children;
+            for (let i = 1; i < links.length; i++) { // Skip header
+                links[i].classList.remove('active-session');
+                links[i].classList.add('hover:bg-[#2A2B32]');
+                // Note: this simple logic assumes order matches. 
+            }
+
+            // Fetch History
+            fetch('/api/chat/sessions/' + sessionId)
+                .then(res => res.json())
+                .then(messages => {
+                    messages.forEach(msg => {
+                        const sender = (msg.role === 'assistant') ? 'ai' : 'user';
+                        appendMessage(msg.content, sender);
+                    });
+                    connectWebSocket();
+                });
+        }
+
+        // --- WebSocket Logic ---
+
+        function connectWebSocket() {
+            var socket = new SockJS('/ws/chat');
+            stompClient = Stomp.over(socket);
+            stompClient.debug = null;
+            stompClient.connect({}, function (frame) {
+                console.log('Connected to session ' + currentSessionId);
+                document.getElementById('connectionStatus').textContent = "Connected";
+
+                // Subscribe to specific session topic
+                stompClient.subscribe('/topic/session/' + currentSessionId, function (response) {
+                    const content = JSON.parse(response.body).content;
+                    removeTypingIndicator();
+                    appendMessage(content, 'ai');
+                    // Refresh session list to update titles if needed
+                    // fetchSessions(); // Optional: might be too chatty
+                });
+            }, function (error) {
+                console.error("Connection error", error);
+                document.getElementById('connectionStatus').textContent = "Error";
+            });
+        }
+
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message || !stompClient || !currentSessionId) return;
+
+            appendMessage(message, 'user');
+
+            // Send with sessionId
+            stompClient.send("/app/chat", {}, JSON.stringify({
+                'sessionId': currentSessionId,
+                'message': message
+            }));
+
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            showTypingIndicator();
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+            e.target.style.height = 'auto';
+            e.target.style.height = e.target.scrollHeight + 'px';
+        }
+
+        // --- UI Rendering ---
+
+        function appendMessage(text, sender) {
+            const row = document.createElement('div');
+            row.className = `message-row ${sender}`;
+            const contentHtml = sender === 'ai' ? marked.parse(text) : text.replace(/\n/g, '<br>');
+
+            row.innerHTML = `
+                <div class="max-w-3xl mx-auto flex px-4">
+                    <div class="avatar ${sender}">
+                        ${sender === 'ai'
+                    ? '<svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-white" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M12 2a10 10 0 1 0 10 10H12V2z"></path><path d="M12 12a10 10 0 1 0 10-10v10z"></path><path d="M12 12a10 10 0 1 0 0 20v-10z"></path></svg>'
+                    : '<svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-white" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>'
+                }
+                    </div>
+                    <div class="flex-1 overflow-hidden">
+                        <div class="content-text ${sender === 'user' ? 'text-gray-100' : 'font-light'}">
+                            ${contentHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+            messagesArea.appendChild(row);
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const row = document.createElement('div');
+            row.id = 'typing-indicator-row';
+            row.className = 'message-row ai';
+            row.innerHTML = `
+                <div class="max-w-3xl mx-auto flex px-4">
+                    <div class="avatar ai">
+                        <svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-white" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M12 2a10 10 0 1 0 10 10H12V2z"></path><path d="M12 12a10 10 0 1 0 10-10v10z"></path><path d="M12 12a10 10 0 1 0 0 20v-10z"></path></svg>
+                    </div>
+                    <div class="flex-1 overflow-hidden flex items-center">
+                        <div class="typing-indicator">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            messagesArea.appendChild(row);
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator-row');
+            if (indicator) indicator.remove();
+        }
+    </script>
+</body>
+
+</html>

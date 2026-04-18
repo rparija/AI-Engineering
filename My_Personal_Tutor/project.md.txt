@@ -1,0 +1,185 @@
+# AI Knowledge Tutor (Spring AI Agent)
+
+## 1. Goal
+Build a Spring Boot application that acts as an AI tutor for a course.  
+Users upload learning content (PDF/Text) and chat with an AI agent that:
+- Retrieves relevant content using RAG
+- Uses tools (explain, quiz, summarize)
+- Tracks learning progress
+- Adapts difficulty using memory
+- Uses an agent loop (reason → act → observe)
+
+The system must NOT be a simple chatbot.  
+It must be a tool-driven, loop-based AI agent.
+
+---
+
+## 2. Tech Stack
+
+- Java 21
+- Spring Boot 3.2+
+- Spring AI
+- OpenAI (GPT-4o or GPT-4.1)
+- MariaDB with vector embeddings
+- WebSocket for chat
+- REST APIs for uploads
+- JSON-based memory store
+- Tool calling using Spring AI @Tool
+- Custom agent loop
+- @project.md.txt refer to this code base for rag and springai. C:\projects\TeluskoProjects\AI-Engineering-Live\08_Spring_AI_Vector_Database_8-12-2025\SpringAIDemo
+
+---
+
+## 3. High Level Architecture
+
+Client → WebSocket Chat → AgentController → AgentService  
+AgentService orchestrates:
+
+- Conversation Memory
+- Vector Store (RAG)
+- Tool Executor
+- LLM Planner
+- LLM Final Response Generator
+
+---
+
+## 4. Core Agent Loop
+
+Implement a loop like this:
+
+1. Load conversation memory for user
+2. Detect intent from user message
+3. Perform vector search if knowledge is required
+4. Ask LLM what action to take
+5. If tool needed, call the tool
+6. Send tool result + context back to LLM
+7. Generate final response
+8. Update memory
+9. Return response to user
+
+This must be coded explicitly.
+
+---
+
+## 5. Tools
+
+Implement these Spring AI tools using @Tool:
+
+### ExplainConceptTool
+Input: topic, difficulty  
+Output: Explanation prompt
+
+### QuizTool
+Input: topic  
+Output: Quiz questions
+
+### SummarizeTool
+Input: content  
+Output: Summary
+
+### ProgressTool
+Input: userId, topic, status  
+Stores learner progress in database
+
+---
+
+## 6. Vector Database
+
+Use MariaDB with vector type.
+
+Create table:
+
+course_embeddings  
+- id  
+- course_id  
+- section  
+- content  
+- embedding VECTOR(1536)  
+- metadata JSON  
+
+Store chunked course data here.
+
+Use cosine similarity search.
+
+---
+
+## 7. RAG Pipeline
+
+When user asks a question:
+
+- Generate embedding
+- Query MariaDB vector table
+- Retrieve top 5 chunks
+- Pass them to LLM as context
+
+---
+
+## 8. Prompts
+
+### System Prompt
+"You are an AI tutor that helps students learn deeply. You can explain, quiz, summarize and track learning progress."
+
+### Planner Prompt
+Given:
+- User message
+- Memory
+- Retrieved context
+
+LLM must output JSON:
+{
+  "action": "EXPLAIN|QUIZ|SUMMARIZE|ASK_FOLLOWUP",
+  "topic": "...",
+  "difficulty": "beginner|intermediate|advanced"
+}
+
+### Final Prompt
+Use:
+- Tool output
+- Retrieved content
+- Memory
+
+Generate tutor response and optionally ask a follow-up.
+
+---
+
+## 9. APIs
+
+### POST /api/upload
+Upload PDF or text
+Chunk and embed content
+Store into MariaDB vector table
+
+### WebSocket /ws/chat
+Send user messages
+Receive agent responses
+
+---
+
+## 10. Memory
+
+Store conversation memory and learning progress per user.
+
+Memory should include:
+- Past messages
+- Weak topics
+- User level (beginner/intermediate/advanced)
+
+---
+
+## 11. Non-Goals (Do not implement)
+- Payments
+- Authentication
+- Multi-course support
+- Video processing
+
+---
+
+## 12. Output Expectation
+
+The generated project must:
+- Start with one command
+- Accept uploads
+- Allow chat
+- Use vector search
+- Use tools
+- Show agent decision making in logs
