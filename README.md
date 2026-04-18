@@ -2,7 +2,7 @@
 
 A curated study repository of hands-on AI engineering examples, classroom demos, and mini-projects built while learning modern AI application development with Java, Python, Spring AI, LangChain, LangGraph, MCP, vector databases, and end-to-end AI products.
 
-## What this repository contains
+## Repository structure
 
 This repo is organized as a learning journey. Most folders are timestamped lesson snapshots, so you can follow the progression from API basics to full AI applications.
 
@@ -41,12 +41,40 @@ This repo is organized as a learning journey. Most folders are timestamped lesso
 - `mcpserver` - MCP server implementation examples
 - `testFileSystemMCP` - filesystem MCP experimentation
 
-## How to use this repo
+## Recommended learning path
 
 1. Start with the lower-numbered folders and move upward.
 2. Open local `README.md` files inside individual projects where available.
 3. Treat each folder as an independent learning module unless the folder clearly contains subprojects.
 4. Add your own API keys, database settings, and environment variables where needed before running examples.
+
+## Standout projects
+
+- `My_Personal_Tutor` - full Spring AI tutor application with chat, ingestion, memory, and MariaDB-backed retrieval
+- `21_Project/SpringEcomAI` - Spring Boot e-commerce backend with AI-powered product and chatbot capabilities
+- `22_Project/SpringEcomAI-LangChain` - Python and LangChain version of the e-commerce AI project
+- `mcp_demo` and `mcpserver` - practical MCP client-server examples
+- `LANGGRAPH-DEMO` - multiple workflow-oriented LangGraph examples in one place
+
+## Running the projects
+
+### Java and Spring Boot projects
+
+- Most Java folders use Maven wrappers, so you can run them with `mvnw.cmd spring-boot:run` from the project directory.
+- Projects using Spring AI usually require `OPENAI_API_KEY` or another model-provider key before startup.
+- Some examples also expect MariaDB running locally with the database names shown in their `application.properties` or `application.yml`.
+
+### Python and LangChain or LangGraph projects
+
+- Create a virtual environment in the project folder.
+- Install dependencies from `pyproject.toml`, `requirements.txt`, or `uv.lock` depending on the project.
+- Add the required keys in local `.env` files before running the scripts.
+
+### Frontend projects
+
+- Frontend apps live mainly in `21_Project/e-com-Frontend` and `22_Project/e-com-Frontend`.
+- Install dependencies with `npm install`.
+- Start the development server with `npm run dev`.
 
 ## Tech covered
 
@@ -67,3 +95,4 @@ This repo is organized as a learning journey. Most folders are timestamped lesso
 - This repository is intended for study and experimentation.
 - Some folders contain independent Maven, Python, or frontend projects with their own setup instructions.
 - Generated folders such as `node_modules` and `target` are intentionally excluded from version control.
+- Example config files now use placeholders for sensitive values; add your own local keys before running AI-powered demos.
