@@ -1,95 +1,83 @@
-# AI Tutor Application
+# My Personal Tutor
 
-A powerful, intelligent learning companion built with **Java 21**, **Spring Boot 3**, and **Spring AI**. This application acts as a personal tutor, capable of answering questions, retrieving course content via **RAG** (Retrieval-Augmented Generation), and maintaining long-term conversation history.
+A Spring Boot and Spring AI study project that brings together chat, retrieval, persistent memory, and a browser UI in one place. This is one of the best folders in the repo for understanding how multiple AI engineering ideas fit together inside a more realistic application.
 
-![AI Tutor Interface] (Add a screenshot link here if you have one, e.g. from the artifacts)
-![alt text](image.png)
+## What this folder teaches
 
-## 🚀 Features
+- How to build a multi-session chat application with Spring AI
+- How to combine a chat model with retrieval-augmented generation
+- How persistent memory and stored conversation history change user experience
+- How a Java backend, database, and browser UI work together in an AI product
 
--   **Interactive Chat**: Real-time chat interface powered by WebSockets and OpenAI's GPT-4o.
--   **Multi-Session Support**: Create multiple distinct chat sessions, switch between them instantly, and preserve separate histories.
--   **RAG (Retrieval-Augmented Generation)**: Ingests and searches course documentation to provide accurate, context-aware answers.
--   **Persistent Memory**: Stores conversation history and user progress in MariaDB with JSON and Vector support.
--   **Agentic Capabilities**: The AI can "plan" and use tools (like searching the codebase or web) to answer complex queries.
--   **Modern UI**: Clean, responsive interface built with Tailwind CSS and Markdown rendering.
+## Why this matters
 
-## 🛠️ Tech Stack
+This folder moves beyond isolated demos. It shows what happens when you need state, retrieval, storage, and a user-facing interface in the same application. For professionals, it is a good bridge between proof-of-concept AI features and real product architecture.
 
--   **Backend**: Java 21, Spring Boot 3.2+
--   **AI Framework**: Spring AI (Milestone 1)
--   **Database**: MariaDB (Native SQL Vector support)
--   **LLM**: OpenAI (GPT-4o)
--   **Frontend**: HTML5, Vanilla JavaScript, Tailwind CSS, SockJS/STOMP
--   **Build Tool**: Maven
+## Architecture overview
 
-## 📋 Prerequisites
+```mermaid
+flowchart LR
+    U[Student using browser UI] --> C[ChatController]
+    C --> A[AgentService]
+    A --> L[OpenAI chat model]
+    A --> R[CourseEmbeddingRepository]
+    R --> DB[(MariaDB)]
+    A --> M[MemoryService]
+    M --> DB
+    D[Course docs or study content] --> I[Ingestion and embedding flow]
+    I --> R
+```
 
-1.  **Java 21 SDK** installed.
-2.  **MariaDB** (10.6+ recommended) installed and running.
-3.  **OpenAI API Key**.
+## Prerequisites
 
-## ⚙️ Setup & Installation
+- Java 21
+- MariaDB running locally
+- Maven or the included Maven wrapper
+- An OpenAI API key
 
-1.  **Clone the Repository**
-    ```bash
-    git clone https://github.com/your-repo/ai-tutor.git
-    cd ai-tutor
-    ```
+## Setup
 
-2.  **Configure Database**
-    -   Create a database named `tutor_db`.
-    -   Ensure your MariaDB instance supports vectors (or use the provided `schema.sql` which attempts to set up the vector column).
+1. Create a MariaDB database named `tutor_db`
+2. Open `src/main/resources/application.yml` and update the datasource username, password, and OpenAI key placeholders
+3. Make sure MariaDB is reachable from the JDBC URL configured in that file
+4. Let Spring initialize the schema on startup
 
-3.  **Configure Environment Variables**
-    Update `src/main/resources/application.yml` or set environment variables:
-    ```yaml
-    spring:
-      datasource:
-        url: jdbc:mariadb://localhost:3306/tutor_db
-        username: <YOUR_DB_USER>
-        password: <YOUR_DB_PASSWORD>
-      ai:
-        openai:
-          api-key: <YOUR_OPENAI_API_KEY>
-    ```
+## How to run
 
-4.  **Database Initialization**
-    The application is configured to run `schema.sql` automatically (`spring.sql.init.mode: always`). This handles table creation:
-    -   `course_embeddings`: Stores RAG content and vectors.
-    -   `chat_sessions`: Stores multi-session chat history.
-    -   `user_memory`: (Legacy) Stores user progress.
+From `C:\projects\TeluskoProjects\AI-Engineering-Live\My_Personal_Tutor`:
 
-5.  **Run the Application**
-    ```bash
-    mvn spring-boot:run
-    ```
+```powershell
+.\mvnw.cmd spring-boot:run
+```
 
-## 🖥️ Usage
+Open the UI at `http://localhost:8080/chat.html`.
 
-1.  **Access the UI**: Open your browser to `http://localhost:8080/chat.html`.
-2.  **Login**: Enter a User ID (e.g., "Student-1") in the welcome modal.
-    -   *Note: This is a simulation ID for session recovery; no password is required.*
-3.  **Start Chatting**: Ask questions about Java, Spring, or general topics.
-4.  **Manage Sessions**:
-    -   Click **+ New chat** in the sidebar to start a fresh topic.
-    -   Click on previous sessions in the sidebar to switch context.
-    -   The AI remembers the context of the *currently selected session*.
+## Expected result
 
-## 🏗️ Architecture Highlights
+You should be able to open the chat UI, create or switch sessions, and ask study-related questions. The app should preserve conversation history and use stored content to ground some responses.
 
--   **`AgentService.java`**: The core brain. It manages the agent loop, decides when to use tools vs. RAG vs. simple chat, and delegates to the LLM.
--   **`MemoryService.java`**: Handles storage and retrieval of chat sessions and messages using Jackson for JSON processing.
--   **`ChatController.java`**: Manages WebSocket endpoints (`/app/chat`, `/topic/session/{id}`) and REST APIs for session management.
--   **`CourseEmbeddingRepository.java`**: Custom repository implementing vector similarity search using native MariaDB SQL queries.
+## What to study here
 
-## 🤝 Contributing
+- `src/main/java` for the main service and controller flow
+- `AgentService` to understand orchestration between simple chat, retrieval, and tools
+- `MemoryService` to understand persistence and session handling
+- `schema.sql` and `application.yml` to see how the DB and initialization are wired
 
-1.  Fork the repository.
-2.  Create a feature branch.
-3.  Commit your changes.
-4.  Push to the branch.
-5.  Open a Pull Request.
+## Troubleshooting
 
----
-*Built with ❤️ by Raul & AI Engineering Live Team*
+- If startup fails, verify the MariaDB port, database name, username, and password
+- If AI calls fail, check the OpenAI key value in `application.yml`
+- If the UI loads but responses fail, inspect backend logs for model or DB connection errors
+- If schema creation fails, check MariaDB version compatibility and SQL initialization settings
+
+## Production considerations
+
+- Move secrets out of config files and into environment variables or a secrets manager
+- Add authentication instead of relying on a simple user ID entry
+- Add stronger validation, observability, and error handling around tool or retrieval failures
+- Consider streaming responses, rate limits, and token or cost monitoring
+
+## What to study next
+
+- Study `21_Project` to compare a product-oriented AI backend
+- Study `LANGGRAPH-DEMO` if you want a more workflow-first orchestration style

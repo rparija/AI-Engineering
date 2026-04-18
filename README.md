@@ -25,7 +25,7 @@ This repo is organized as a learning journey. Most folders are timestamped lesso
 - `13_LangChain_Tool_Calling_22-12-2025` - additional Python tool-calling examples
 - `14_MCP_23-12-2025` - first MCP-oriented Spring AI experiments
 - `15_MCP_26-12-2025` - MCP demo applications and server setup
-- `15_MCP_Langchain_29-12-2025_custom` - custom LangChain plus MCP filesystem/server experiments
+- `15_MCP_Langchain_29-12-2025_custom` - custom LangChain plus MCP filesystem or server experiments
 - `16_MCP_Langchain_29-12-2025` - MCP with LangChain integrations and filesystem tooling
 - `17_Langchain_AI_Agents_05-01-2026` - agent-oriented LangChain examples
 - `18_LangGraph_08_01_2026` - multi-agent and workflow orchestration with LangGraph
@@ -42,6 +42,28 @@ This repo is organized as a learning journey. Most folders are timestamped lesso
 - `mcp_demo` - MCP client-side demo project
 - `mcpserver` - MCP server implementation examples
 - `testFileSystemMCP` - filesystem MCP experimentation
+
+## Start here
+
+If you are new to the repo, begin with `START-HERE.md`. It includes a beginner-to-advanced study path, short-track recommendations, and a suggested order for moving from simple demos to full applications.
+
+## Concept map
+
+This repository is easiest to understand if you think of it as a progression of capabilities:
+
+- **SDK basics** - `01`, `02`, and `05` show how to call models directly or through a framework
+- **Embeddings** - `03` and `06` introduce semantic representations used later in search and retrieval
+- **Vector databases** - `08` shows how embedded content becomes searchable
+- **RAG** - `09` and `10` combine retrieval with generation to ground answers in real data
+- **Tool calling** - `11`, `12`, and `13` show how models invoke structured capabilities beyond plain prompting
+- **MCP** - `14`, `15`, `16`, `mcp_demo`, and `mcpserver` move from tool exposure to client-server tool ecosystems
+- **Agents and workflows** - `17`, `18`, `19`, `20`, and `LANGGRAPH-DEMO` show orchestration, state, and multi-step reasoning patterns
+- **End-to-end products** - `21_Project`, `22_Project`, and `My_Personal_Tutor` combine these ideas into complete applications
+- **Model ecosystem** - `23_Hugging_Face_And_Fine_Tuning` expands the path beyond hosted APIs and into model experimentation
+
+A simple way to read the repo is:
+
+`prompting -> embeddings -> vector search -> RAG -> tool calling -> MCP -> agents -> workflows -> full applications`
 
 ## Recommended learning path
 
