@@ -1,0 +1,348 @@
+:root {
+  --bg: #f4efe7;
+  --surface: #fffaf3;
+  --surface-strong: #fff;
+  --ink: #18222d;
+  --muted: #5e6a75;
+  --line: rgba(24, 34, 45, 0.12);
+  --accent: #d96c2f;
+  --accent-dark: #8f3f17;
+  --accent-soft: #f5d9c8;
+  --slate: #203447;
+  --shadow: 0 18px 50px rgba(28, 42, 56, 0.12);
+  --radius: 22px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: "IBM Plex Sans", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(217, 108, 47, 0.16), transparent 28%),
+    radial-gradient(circle at top right, rgba(32, 52, 71, 0.12), transparent 30%),
+    var(--bg);
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.hero,
+.section,
+.footer {
+  width: min(1160px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.hero {
+  padding: 24px 0 56px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px 0 28px;
+}
+
+.brand {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.topbar-links {
+  display: flex;
+  gap: 20px;
+  color: var(--muted);
+}
+
+.topbar-links a:hover,
+.footer a:hover {
+  color: var(--accent-dark);
+}
+
+.hero-inner {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 28px;
+  align-items: stretch;
+}
+
+.hero-copy,
+.panel-card,
+.journey-card,
+.project-card,
+.setup-card,
+.guide-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 250, 243, 0.82);
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow);
+}
+
+.hero-copy {
+  padding: 44px;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin: 0 0 14px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0 0 12px;
+  font-family: "Space Grotesk", sans-serif;
+  line-height: 1.1;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 5vw, 4.4rem);
+  max-width: 11ch;
+}
+
+h2 {
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+}
+
+h3 {
+  font-size: 1.2rem;
+}
+
+.hero-text,
+.section-heading p,
+.setup-card p,
+.guide-card p,
+.project-card p,
+.journey-card p,
+.footer,
+.panel-card p,
+.panel-card li {
+  color: var(--muted);
+}
+
+.hero-text {
+  max-width: 58ch;
+  font-size: 1.05rem;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.button:hover,
+.journey-card:hover,
+.project-card:hover,
+.guide-card:hover,
+.setup-card:hover {
+  transform: translateY(-2px);
+}
+
+.button.primary {
+  background: var(--ink);
+  color: #fff;
+}
+
+.button.secondary {
+  border: 1px solid var(--line);
+  background: transparent;
+}
+
+.hero-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.panel-card {
+  padding: 24px;
+}
+
+.panel-card ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.panel-card.accent {
+  background: linear-gradient(180deg, rgba(217, 108, 47, 0.92), rgba(143, 63, 23, 0.95));
+  color: #fff;
+}
+
+.panel-card.accent p {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.section {
+  padding: 22px 0 52px;
+}
+
+.section-alt {
+  position: relative;
+}
+
+.section-alt::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 100vw;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.05));
+  z-index: -1;
+}
+
+.section-heading {
+  max-width: 760px;
+  margin-bottom: 24px;
+}
+
+.journey-grid,
+.project-grid,
+.setup-grid,
+.guide-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.journey-grid {
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+
+.project-grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.setup-grid,
+.guide-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.journey-card,
+.project-card,
+.setup-card,
+.guide-card {
+  padding: 24px;
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+.journey-card:hover,
+.project-card:hover,
+.setup-card:hover,
+.guide-card:hover {
+  border-color: rgba(217, 108, 47, 0.45);
+}
+
+.journey-number {
+  display: inline-flex;
+  min-width: 58px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  border-radius: 999px;
+  background: var(--slate);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+code {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: #1f2933;
+  color: #f5f7fa;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.95rem;
+}
+
+.footer {
+  padding: 16px 0 44px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 920px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .topbar-links {
+    flex-wrap: wrap;
+  }
+
+  .hero-copy {
+    padding: 30px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero,
+  .section,
+  .footer {
+    width: min(100% - 20px, 1160px);
+  }
+
+  .hero {
+    padding-top: 16px;
+  }
+
+  .hero-copy,
+  .journey-card,
+  .project-card,
+  .setup-card,
+  .guide-card,
+  .panel-card {
+    padding: 20px;
+  }
+
+  h1 {
+    max-width: none;
+  }
+
+  .button {
+    width: 100%;
+  }
+}

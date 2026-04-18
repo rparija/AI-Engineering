@@ -2,6 +2,8 @@
 
 A curated study repository of hands-on AI engineering examples, classroom demos, and mini-projects built while learning modern AI application development with Java, Python, Spring AI, LangChain, LangGraph, MCP, vector databases, and end-to-end AI products.
 
+GitHub Pages site: `https://rparija.github.io/AI-Engineering/`
+
 ## Repository structure
 
 This repo is organized as a learning journey. Most folders are timestamped lesson snapshots, so you can follow the progression from API basics to full AI applications.
